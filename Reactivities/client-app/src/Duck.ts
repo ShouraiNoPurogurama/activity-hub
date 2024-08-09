@@ -1,4 +1,4 @@
-interface Duck {
+export interface Duck {
     name : string;
     numLegs: number;
     makeSound: (sound : string) => void;

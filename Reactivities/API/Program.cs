@@ -1,3 +1,4 @@
+using Application.Activities;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Entities;
@@ -13,6 +14,16 @@ services.AddDbContext<DBContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+    });
+});
+
+services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -20,6 +31,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("CorsPolicy");
+app.UseAuthorization();
 
 app.MapControllers();
 
