@@ -4,28 +4,53 @@ import agent from "../api/agent";
 import { v4 as uuid } from 'uuid'
 
 export default class ActivityStore {
-    activities: Activity[] = [];
+    activityRegistry = new Map<string, Activity>();
     selectedActivity: Activity | undefined = undefined;
     editMode = false;
     loading = false;
-    loadingInitial = false;
+    loadingInitial = true;
 
     constructor() {
         makeAutoObservable(this)
     }
 
+    get activitiesByDate() {
+        return Array.from(this.activityRegistry.values()).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+    }
+
+    loadActivity = async (id: string) => {
+        let activity = this.getActivity(id);
+        if (activity) this.selectedActivity = activity;
+        else {
+            this.setLoadingInitial(true);
+            try {
+                activity = await agent.Activities.details(id);
+                this.setActivity(activity);
+                this.loadingInitial = false;
+            } catch (error) {
+                console.log(error);
+                this.loadingInitial = false;
+            }
+        }
+    }
+
+    private setActivity = (activity: Activity) => {
+        activity.date = activity.date.split("T")[0];
+        this.activityRegistry.set(activity.id, activity)
+    }
+
+    private getActivity = (id: string) => {
+        return this.activityRegistry.get(id);
+    }
+
     //use arrow function to bind the function with the class automatically
     loadActivities = async () => {
-        this.setLoadingInitial(true);
         try {
             const activities = await agent.Activities.list();
-            this.activities = [];
             activities.forEach(activity => {
-                activity.date = activity.date.split("T")[0];
-                this.activities.push(activity)
+                this.setActivity(activity)
             })
             this.setLoadingInitial(false);
-            this.activities.forEach(a => console.log(a.title))
         } catch (error) {
             console.log(error)
             this.setLoadingInitial(false);
@@ -35,9 +60,9 @@ export default class ActivityStore {
     setLoadingInitial = (state: boolean) => {
         this.loadingInitial = state;
     }
- 
+
     selectActivity = (id: string) => {
-        this.selectedActivity = this.activities.find(a => a.id === id);
+        this.selectedActivity = this.activityRegistry.get(id);
     }
 
     cancelSelectActivity = () => {
@@ -59,7 +84,7 @@ export default class ActivityStore {
         try {
             await agent.Activities.create(activity);
             runInAction(() => {
-                this.activities.push(activity);
+                this.activityRegistry.set(activity.id, activity)
                 this.selectedActivity = activity;
                 this.editMode = false;
                 this.loading = false;
@@ -67,7 +92,7 @@ export default class ActivityStore {
         } catch (error) {
             console.log(error)
             runInAction(() => {
-                this.loading= false;
+                this.loading = false;
             })
         }
     }
@@ -77,8 +102,7 @@ export default class ActivityStore {
         try {
             await agent.Activities.update(activity);
             runInAction(() => {
-                this.activities = this.activities.filter(a => a.id !== activity.id)
-                this.activities.push(activity)
+                this.activityRegistry.set(activity.id, activity)
                 this.selectedActivity = activity;
                 this.editMode = false;
                 this.loading = false
@@ -96,8 +120,8 @@ export default class ActivityStore {
         try {
             await agent.Activities.delete(id);
             runInAction(() => {
-                this.activities = this.activities.filter(a => a.id !== id);
-                if(this.selectedActivity?.id === id) this.cancelSelectActivity();
+                this.activityRegistry.delete(id);
+                // if (this.selectedActivity?.id === id) this.cancelSelectActivity();
                 this.loading = false;
             })
         } catch (error) {

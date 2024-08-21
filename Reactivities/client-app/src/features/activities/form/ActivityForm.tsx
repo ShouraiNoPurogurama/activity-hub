@@ -3,11 +3,7 @@ import { Button, Form, Segment } from "semantic-ui-react";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
 
-interface Props {
-    submitting: boolean;
-}
-
-export default observer( function ActivityForm({} : Props) {
+export default observer( function ActivityForm() {
     const {activityStore} = useStore(); 
     const {selectedActivity, closeForm, createActivity, updateActivity, loading} = activityStore;
 
