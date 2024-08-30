@@ -10,25 +10,23 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Activity>>> GetActivities(CancellationToken cancellationToken)
         {
-            return await Mediator.Send(new List.Query(), cancellationToken);
+            return HandleResult(await Mediator.Send(new List.Query(), cancellationToken));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Activity?>> GetActivity(Guid id)
+        public async Task<IActionResult> GetActivity(Guid id)
         {
-            var activity = await Mediator.Send(new Details.Query { Id = id });
+            var result = await Mediator.Send(new Details.Query { Id = id });
 
-            if (activity is null) return NotFound();
-
-            return activity;
-
+            return HandleResult(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Activity activity)
         {
-            await Mediator.Send(new Create.Command { Activity = activity });
-            return Ok();
+            var result = await Mediator.Send(new Create.Command { Activity = activity });
+            
+            return HandleResult(result);
         }
 
         [HttpPut("{id}")]
@@ -42,9 +40,8 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await Mediator.Send(new Delete.Command { Id = id });
-            return Ok();
+            var result = await Mediator.Send(new Delete.Command { Id = id });
+            return HandleResult(result);
         }
-        
     }
 }
