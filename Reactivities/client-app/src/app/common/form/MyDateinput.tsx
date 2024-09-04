@@ -6,9 +6,8 @@ type Props = {
     label: string;
     type?: string;
     showLabel?: boolean;
-}   &  Partial<DatePickerProps> 
+}   &  DatePickerProps
  
-
 export default function MyDateInput(props: Props) {
     const [field, meta, helpers] = useField(props.name!);
     return (
