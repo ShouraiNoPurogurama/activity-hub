@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Domain;
+﻿using Domain;
 using Microsoft.AspNetCore.Identity;
 using Persistence.Entities;
 
@@ -16,13 +12,29 @@ namespace Persistence
             {
                 var users = new List<AppUser>()
                 {
-                    new AppUser("Bob", "bob", "bob@test.com"),
-                    new AppUser("Tom", "Tom", "tom@test.com"),
-                    new AppUser("NA", "NA", "na@test.com")
+                    new AppUser
+                    {
+                    DisplayName = "Bob", 
+                    UserName = "bob", 
+                    Email= "bob@test.com",
+                    },
+                    new AppUser
+                    {
+                    DisplayName = "Tom", 
+                    UserName = "tom", 
+                    Email= "tom@test.com",
+                    },
+                    new AppUser
+                    {
+                    DisplayName = "NA", 
+                    UserName = "na", 
+                    Email= "na@test.com",
+                    },
+                    
                 };
                 foreach (var user in users)
                 {
-                    await userManager.CreateAsync(user, "Password");
+                    await userManager.CreateAsync(user, "Pa$$w0rd");
                 }
             }
 

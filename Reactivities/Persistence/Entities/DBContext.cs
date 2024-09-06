@@ -11,5 +11,4 @@ public class DBContext : IdentityDbContext<AppUser>
         
     }
     public DbSet<Activity> Activities { get; set; }
-    public DbSet<AppUser> AppUsers { get; set; }
 }
