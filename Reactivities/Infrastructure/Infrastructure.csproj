@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Application\Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CloudinaryDotNet" Version="1.26.1" />
+    </ItemGroup>
+
 </Project>

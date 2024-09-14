@@ -21,6 +21,13 @@ public class MappingProfiles : Profile
                 s => s.AppUser.UserName))
             .ForMember(d => d.Bio, o => o.MapFrom(
                 s => s.AppUser.Bio))
-        ;
+            ;
+
+        //Map user Main photo to profile photo
+        CreateMap<AppUser, Profiles.Profile>()
+            .ForMember(d => d.Image,
+                opt => 
+                    opt.MapFrom(src => src.Photos.FirstOrDefault(x => x.IsMain).Url))
+            ;
     }
 }
