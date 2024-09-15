@@ -21,12 +21,15 @@ public class AccountController : ControllerBase
         _userManager = userManager;
         _tokenService = tokenService;
     }
-    
+
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
-        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+        var user = await _userManager.Users
+            .Include(u => u.Photos)
+            .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+
         if (user is null) return Unauthorized();
         var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
         if (result)
@@ -43,7 +46,7 @@ public class AccountController : ControllerBase
         {
             Username = user.UserName,
             DisplayName = user.DisplayName,
-            Image = null,
+            Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
             Token = _tokenService.CreateToken(user)
         };
     }
@@ -57,7 +60,7 @@ public class AccountController : ControllerBase
             ModelState.AddModelError("username", "Username taken");
             return ValidationProblem();
         }
-        
+
         if (await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
         {
             ModelState.AddModelError("email", "Email taken");
@@ -75,7 +78,7 @@ public class AccountController : ControllerBase
         if (result.Succeeded)
         {
             return CreateUserObject(user);
-        } 
+        }
 
         return BadRequest(result.Errors);
     }
@@ -86,7 +89,9 @@ public class AccountController : ControllerBase
     public async Task<ActionResult<UserDto>> GetCurrentUser()
     {
         //claim principles of the User object is based on the provided Jwt Token in the [Authorize] attribute
-        var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email)!);
+        var user = await _userManager.Users
+            .Include(u => u.Photos)
+            .FirstOrDefaultAsync(u => u.Email == User.FindFirstValue(ClaimTypes.Email));
         return CreateUserObject(user!);
     }
 }
