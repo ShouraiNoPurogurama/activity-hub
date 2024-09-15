@@ -75,4 +75,22 @@ export default class ProfileStore {
             runInAction(() => this.loading = false);
         }
     }
+
+    deletePhoto = async (photo: Photo) => {
+        this.loading = true;
+        try {
+            //delete from server through API
+            await agent.Profiles.deletePhoto(photo.id);
+            runInAction(() => {
+                if(this.profile) {
+                    //delete photo from store
+                    this.profile.photos = this.profile.photos?.filter(p => p.id !== photo.id);
+                    this.loading = false;
+                }
+            })
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.loading = false);
+        }
+    }
 }
