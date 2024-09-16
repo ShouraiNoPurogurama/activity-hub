@@ -29,9 +29,18 @@ public class Details
         public async Task<Result<ActivityDto>> Handle(Query request, CancellationToken cancellationToken)
         {
             var activity = await _context.Activities
-                .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider)
-                .FirstOrDefaultAsync(d => d.Id == request.Id)
+                    .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider)
+                    .FirstOrDefaultAsync(d => d.Id == request.Id, cancellationToken: cancellationToken)
                 ;
+
+            var host = activity!.Attendees
+                .First(a => a.Username == activity.HostUsername);
+            
+            activity.Attendees = activity.Attendees
+                .Where(att => att.Username != activity.HostUsername)
+                .Prepend(host)
+                .ToList();
+            
             return Result<ActivityDto>.Success(activity);
         }
     }

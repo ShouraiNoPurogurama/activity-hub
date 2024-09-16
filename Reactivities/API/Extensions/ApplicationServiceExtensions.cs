@@ -31,6 +31,7 @@ public static class ApplicationServiceExtensions
                 policy => { policy
                     .AllowAnyHeader()
                     .AllowAnyMethod()
+                    .AllowCredentials()
                     .WithOrigins("http://localhost:3000"); });
         });
 
@@ -42,6 +43,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IUserAccessor, UserAccessor>();
         services.AddScoped<IPhotoAccessor, PhotoAccessor>();
         services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+        services.AddSignalR();
         
         return services;
     }

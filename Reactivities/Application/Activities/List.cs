@@ -28,11 +28,8 @@ public class List
         public async Task<Result<List<ActivityDto>>> Handle(Query request, CancellationToken cancellationToken)
         {
             var activities = await _context.Activities
-                // .Include(a => a.Attendees)
-                // .ThenInclude(aa => aa.AppUser)
                 .ProjectTo<ActivityDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
-
             return Result<List<ActivityDto>>.Success(activities);
         }
     }
