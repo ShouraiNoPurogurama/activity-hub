@@ -32,5 +32,9 @@ public class MappingProfiles : Profile
                 opt =>
                     opt.MapFrom(src => src.Photos.FirstOrDefault(x => x.IsMain).Url))
             ;
+        CreateMap<Profiles.Profile, AppUser>()
+            .ForMember(d => d.DisplayName, opt => opt.MapFrom(src => src.DisplayName))
+            .ForMember(d => d.Bio, opt => opt.MapFrom(src => src.Bio))
+            ;
     }
 }

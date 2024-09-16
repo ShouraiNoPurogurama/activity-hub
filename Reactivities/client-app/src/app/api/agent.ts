@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { router } from "../router/Route";
 import { store } from "../stores/store";
 import { User, UserFormValues } from "../models/user";
-import { Photo, Profile } from "../models/profile";
+import { Photo, Profile, ProfileFormValues } from "../models/profile";
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -98,6 +98,7 @@ const Profiles = {
     },
     setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
     deletePhoto: (id: string) => requests.delete(`/photos/${id}`),
+    editProfile: (profileFormValues : ProfileFormValues) => requests.put<void>(`/profiles`, profileFormValues)
 }
 
 const agent = {
