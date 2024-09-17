@@ -7,7 +7,8 @@ export default class ProfileStore {
     profile: Profile | null = null;
     loadingProfile = false;
     uploading = false;
-    loading = false
+    loading = false;
+    followings : Profile[] = [];
     /**
      *
      */
@@ -105,6 +106,41 @@ export default class ProfileStore {
             })
         } catch (error) {
             runInAction(() => this.loading = false) 
+        }
+    }
+
+    updateFollowing = async (username: string, following: boolean) => {
+        this.loading = true;
+        try {
+            await agent.Profiles.updateFollowing(username);
+            store.activityStore.updateAttendeeFollowing(username);
+            runInAction(() => {
+                //if the profile to be follow/unfollow not the current logged-in user
+                //this.profile: target profile
+                //this step increase/decrease the target profile followers count
+                if(this.profile && this.profile.username !== store.userStore.user?.username) {
+                    following ? this.profile.followersCount++ : this.profile.followersCount--;
+                    this.profile.following = !this.profile.following;
+                }
+                console.log('this.profile equals to '+this.profile?.displayName)
+                //after adjust the target profile followers count, we need to update its followings collection
+                //access to each profile that the watching profile follows
+                //if A is watching B and B unfollow/follow someone, update the status here
+                this.followings.forEach(profile =>  {                    
+                    //if a profile in the followings collection found, then unfollow, else, follow
+                    if(profile.username === username) {
+                        //existing status
+                        profile.following ? profile.followersCount-- : profile.followersCount++;
+                        profile.following = !profile.following;
+                    }
+                })
+                this.loading = false;
+            })
+        } catch (error) {
+            console.log(error);
+            runInAction(() => {
+                this.loading = false;
+            })
         }
     }
 }

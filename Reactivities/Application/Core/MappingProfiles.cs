@@ -9,6 +9,7 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
+        string? currentUsername = null;
         CreateMap<Activity, Activity>();
         CreateMap<Activity, ActivityDto>()
             .ForMember(d => d.HostUsername,
@@ -25,6 +26,11 @@ public class MappingProfiles : Profile
             .ForMember(d => d.Image,
                 opt =>
                     opt.MapFrom(src => src.AppUser.Photos.FirstOrDefault(x => x.IsMain).Url))
+            .ForMember(d => d.FollowersCount, opt => opt.MapFrom(src => src.AppUser.Followers.Count))
+            .ForMember(d => d.FollowingCount, opt => opt.MapFrom(src => src.AppUser.Followings.Count))
+            .ForMember(d => d.Following,
+                opt => opt.MapFrom(src => src.AppUser.Followers.Any(f => f.Observer.UserName == currentUsername)))
+            ;
             ;
 
         //Map user Main photo to profile photo
@@ -32,6 +38,10 @@ public class MappingProfiles : Profile
             .ForMember(d => d.Image,
                 opt =>
                     opt.MapFrom(src => src.Photos.FirstOrDefault(x => x.IsMain).Url))
+            .ForMember(d => d.FollowersCount, opt => opt.MapFrom(src => src.Followers.Count))
+            .ForMember(d => d.FollowingCount, opt => opt.MapFrom(src => src.Followings.Count))
+            .ForMember(d => d.Following,
+                opt => opt.MapFrom(src => src.Followers.Any(f => f.Observer.UserName == currentUsername)))
             ;
         CreateMap<Comment, CommentDto>()
             .ForMember(d => d.DisplayName, o => o.MapFrom(
