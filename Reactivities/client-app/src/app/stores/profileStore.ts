@@ -1,5 +1,5 @@
 import { Photo, Profile, ProfileFormValues } from './../models/profile';
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 import agent from "../api/agent";
 import { store } from './store';
 
@@ -8,12 +8,31 @@ export default class ProfileStore {
     loadingProfile = false;
     uploading = false;
     loading = false;
-    followings : Profile[] = [];
+    followings: Profile[] = [];
+    loadingFollowing = false;
+    activeTab = 0;
     /**
      *
      */
     constructor() {
         makeAutoObservable(this);
+
+        //handle distinct the Followers and Following tab in Profile Content TabPane
+        reaction(
+            () => this.activeTab,
+            activeTab => {
+                if (activeTab === 3 || activeTab === 4) {
+                    const predicate = activeTab === 3 ? 'followers' : "following";
+                    this.loadFollowings(predicate);
+                } else {
+                    this.followings = [];
+                }
+            }
+        )
+    }
+
+    setActiveTab = (activeTab: number) => {
+        this.activeTab = activeTab;
     }
 
     get isCurrentUser() {
@@ -105,7 +124,7 @@ export default class ProfileStore {
                 this.loading = false;
             })
         } catch (error) {
-            runInAction(() => this.loading = false) 
+            runInAction(() => this.loading = false)
         }
     }
 
@@ -118,17 +137,21 @@ export default class ProfileStore {
                 //if the profile to be follow/unfollow not the current logged-in user
                 //this.profile: target profile
                 //this step increase/decrease the target profile followers count
-                if(this.profile && this.profile.username !== store.userStore.user?.username) {
+                if (this.profile && this.profile.username !== store.userStore.user?.username
+                    && this.profile.username !== username
+                ) {
                     following ? this.profile.followersCount++ : this.profile.followersCount--;
                     this.profile.following = !this.profile.following;
                 }
-                console.log('this.profile equals to '+this.profile?.displayName)
+                console.log('this.profile equals to ' + this.profile?.displayName)
                 //after adjust the target profile followers count, we need to update its followings collection
-                //access to each profile that the watching profile follows
                 //if A is watching B and B unfollow/follow someone, update the status here
-                this.followings.forEach(profile =>  {                    
+                if(this.profile && this.profile.username === store.userStore.user?.username) {
+                    following ? this.profile.followingCount++ : this.profile.followingCount--;
+                }
+                this.followings.forEach(profile => {
                     //if a profile in the followings collection found, then unfollow, else, follow
-                    if(profile.username === username) {
+                    if (profile.username === username) {
                         //existing status
                         profile.following ? profile.followersCount-- : profile.followersCount++;
                         profile.following = !profile.following;
@@ -141,6 +164,21 @@ export default class ProfileStore {
             runInAction(() => {
                 this.loading = false;
             })
+        }
+    }
+
+    loadFollowings = async (predicate: string) => {
+        this.loadingFollowing = true;
+        try {
+            const followings = await agent.Profiles.listFollowing(this.profile!.username, predicate);
+            runInAction(() => {
+                this.followings = followings;
+                this.loadingFollowing = false;
+            })
+
+        } catch (error) {
+            console.log(error);
+            runInAction(() => this.loadingFollowing = false)
         }
     }
 }
