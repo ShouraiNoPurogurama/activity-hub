@@ -1,7 +1,8 @@
 ﻿using Application.Activities;
 using Application.Comments;
-using AutoMapper;
+using Application.Profiles;
 using Domain;
+using Profile = AutoMapper.Profile;
 
 namespace Application.Core;
 
@@ -31,7 +32,7 @@ public class MappingProfiles : Profile
             .ForMember(d => d.Following,
                 opt => opt.MapFrom(src => src.AppUser.Followers.Any(f => f.Observer.UserName == currentUsername)))
             ;
-            ;
+        ;
 
         //Map user Main photo to profile photo
         CreateMap<AppUser, Profiles.Profile>()
@@ -51,5 +52,10 @@ public class MappingProfiles : Profile
             .ForMember(d => d.Image,
                 opt =>
                     opt.MapFrom(src => src.Author.Photos.FirstOrDefault(x => x.IsMain).Url));
+
+        CreateMap<Activity, UserActivityDto>()
+            .ForMember(des => des.HostUsername, opt => opt.MapFrom(
+                src => src.Attendees.Single(a => a.IsHost == true).AppUser.UserName
+            ));
     }
 }

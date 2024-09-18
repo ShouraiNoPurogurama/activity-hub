@@ -1,8 +1,11 @@
 using Application.Activities;
 using Application.Core;
+using Application.Profiles;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Details = Application.Activities.Details;
+using Edit = Application.Activities.Edit;
 
 
 namespace API.Controllers
@@ -14,7 +17,7 @@ namespace API.Controllers
         {
             return HandlePagedResult(await Mediator.Send(new List.Query() {Params = param}, cancellationToken));
         }
-
+        
         [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivity(Guid id)
