@@ -9,11 +9,11 @@ namespace API.Controllers;
 [Route("api/[controller]")]
 public class BaseApiController : ControllerBase
 {
-    private IMediator? _mediator;
+    private IMediator _mediator;
 
     protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>()!;
 
-    protected ActionResult HandleResult<T>(Result<T>? result)
+    protected ActionResult HandleResult<T>(Result<T> result)
     {
         if (result is null) return BadRequest();
         if (result.IsSuccess && result.Value is not null)
@@ -23,7 +23,7 @@ public class BaseApiController : ControllerBase
         return BadRequest(result.Error);
     }
 
-    protected ActionResult HandlePagedResult<T>(Result<PagedList<T>>? result)
+    protected ActionResult HandlePagedResult<T>(Result<PagedList<T>> result)
     {
         if (result is null) return BadRequest();
         if (result.IsSuccess && result.Value is not null)

@@ -10,7 +10,7 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        string? currentUsername = null;
+        string currentUsername = null;
         CreateMap<Activity, Activity>();
         CreateMap<Activity, ActivityDto>()
             .ForMember(d => d.HostUsername,

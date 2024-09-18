@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react-lite';
-import { Button, Header, Item, Segment, Image, Label } from 'semantic-ui-react'
+import { Header, Item, Segment, Image, Label, Button } from 'semantic-ui-react'
 import { Activity } from "../../../app/models/activity";
-import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useStore } from '../../../app/stores/store';
+import { Link } from 'react-router-dom';
 
 const activityImageStyle = {
     filter: 'brightness(30%)'
@@ -68,11 +68,15 @@ export default observer(function ActivityDetailedHeader({ activity }: Props) {
                                 loading={loading}
                             >
                             </Button>
-                            <Button as={Link}
+                            <Button 
+                                as={Link}
                                 disabled={activity.isCancelled}
                                 to={`/manage/${activity.id}`}
                                 color='orange'
-                                floated='right'>
+                                floated='right'
+                                
+                                onClick={() => console.log(activity.id)}
+                                >
                                 Manage Event
                             </Button>
                         </>

@@ -51,7 +51,7 @@ public class PhotoAccessor : IPhotoAccessor
         return null;
     }
 
-    public async Task<string?> DeletePhoto(string publicId)
+    public async Task<string> DeletePhoto(string publicId)
     {
         var deleteParams = new DeletionParams(publicId);
         var result = await _cloudinary.DestroyAsync(deleteParams);

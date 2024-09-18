@@ -17,7 +17,7 @@ import { v4 as uuid } from "uuid";
 export default observer(function ActivityForm() {
     const { activityStore } = useStore();
     const {
-         loadActivity, loadingInitial, createActivity, updateActivity } = activityStore;
+        loadActivity, loadingInitial, createActivity, updateActivity } = activityStore;
     const { id } = useParams();
     const navigate = useNavigate();
     const [activity, setActivity] = useState<ActivityFormValues>(new ActivityFormValues())
@@ -33,14 +33,13 @@ export default observer(function ActivityForm() {
 
     useEffect(() => {
         if (id) loadActivity(id).then(activity => setActivity(new ActivityFormValues(activity))), [id, loadActivity]
-    })
+    }, [])
 
     function handleFormSubmit(activity: ActivityFormValues) {
         if (!activity.id) {
             let newActivity = {
                 ...activity, id: uuid()
             }
-            console.log('created activity: ' + newActivity.id);
             createActivity(newActivity).then(() => navigate(`/activities/${newActivity.id}`));
         }
         else {
@@ -70,6 +69,7 @@ export default observer(function ActivityForm() {
                         <MyTextArea rows={3} placeholder='Description' name='description' />
                         <MySelectInput options={categoryOptions} placeholder='Category' name='category' />
                         <MyDateInput
+                            onChange={() => { }}
                             label="Date"
                             placeholderText='Date'
                             name='date'

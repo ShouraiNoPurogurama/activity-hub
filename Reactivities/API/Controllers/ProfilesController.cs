@@ -1,5 +1,4 @@
-﻿using Application.Core;
-using Application.Profiles;
+﻿using Application.Profiles;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;

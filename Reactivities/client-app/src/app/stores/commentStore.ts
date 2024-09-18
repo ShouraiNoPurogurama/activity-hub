@@ -1,6 +1,6 @@
 import { ChatComment } from './../models/comment';
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import { makeAutoObservable, runInAction, values } from "mobx";
+import { makeAutoObservable, runInAction } from "mobx";
 import { store } from "./store";
 
 export default class CommentStore {
@@ -16,14 +16,14 @@ export default class CommentStore {
 
     createHubConnection = (activityId: string) => {
         this.hubConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5000/chat?activityId=' + activityId, {
+            .withUrl(import.meta.env.VITE_CHAT_URL+'?activityId=' + activityId, {
                 accessTokenFactory: () => store.userStore.user?.token as string
             })
             .withAutomaticReconnect()
             .configureLogging(LogLevel.Information)
             .build();
         
-        this.hubConnection.start().catch(error => console.log("Error establishing the connection"))
+        this.hubConnection.start().catch(() => console.log("Error establishing the connection"))
 
         this.hubConnection.on('LoadComments', (comments: ChatComment[]) => {
             runInAction(() => {

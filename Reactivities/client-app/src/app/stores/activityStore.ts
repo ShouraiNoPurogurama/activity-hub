@@ -36,7 +36,7 @@ export default class ActivityStore {
     setPredicate = (predicate: string, value: string | Date) => {
         const resetPredicate = () => {
             //keep the startDate until the user choose another day
-            this.predicate.forEach((value, key) => {
+            this.predicate.forEach((_value, key) => {
                 if (key !== 'startDate') this.predicate.delete(key);
             })
         }
