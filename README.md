@@ -1,3 +1,5 @@
+**DEPLOYMENT URL**: https://activityhub-na.azurewebsites.net/activities 
+
 **Reactivities Web Application**
 Project Overview
 This project is a modern web application designed to facilitate user activities and interactions, featuring functionalities like activity posting, user subscriptions, real-time chatting and following, and media management.
