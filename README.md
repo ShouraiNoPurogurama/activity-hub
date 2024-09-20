@@ -1,4 +1,4 @@
-**DEPLOYMENT URL**: https://activityhub-na.azurewebsites.net/activities 
+**DEPLOYMENT URL**: https://activityhub-na.azurewebsites.net/ 
 
 **Reactivities Web Application**
 Project Overview
