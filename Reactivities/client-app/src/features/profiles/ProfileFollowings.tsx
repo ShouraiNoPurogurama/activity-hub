@@ -5,7 +5,7 @@ import ProfileCard from "./ProfileCard";
 
 export default observer(function ProfileFollowing() {
     const { profileStore } = useStore();
-    const { profile, followings, 
+    const { profile, followings,
         loadingFollowing: loadingFollowings, activeTab } = profileStore;
 
     return (
@@ -14,8 +14,8 @@ export default observer(function ProfileFollowing() {
                 <Grid.Column width={16}>
                     <Header floated="left"
                         icon={'user'}
-                        content={activeTab === 3 ? `People following ${profile?.displayName}` 
-                        : `People ${profile?.displayName} is following`} />
+                        content={activeTab === 3 ? `People following ${profile?.displayName}`
+                            : `People ${profile?.displayName} is following`} />
                 </Grid.Column>
                 <Grid.Column width={16}>
                     <Card.Group itemsPerRow={4}>

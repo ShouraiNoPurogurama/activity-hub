@@ -24,16 +24,22 @@ export default class ProfileStore {
         reaction(
             () => this.activeTab,
             activeTab => {
-                console.log('current active tab:' + activeTab)
                 if (activeTab === 3 || activeTab === 4) {
                     const predicate = activeTab === 3 ? 'followers' : "following";
-                    console.log(predicate)
                     this.loadFollowings(predicate);
                 } else {
                     this.followings = [];
                 }
             }
         )
+    }
+
+    setFollowings = async (followings: Profile[], username?: string) => {
+        if (username) {
+            const profile = await agent.Profiles.get(username)
+            this.followings = [...followings, profile];
+        } 
+        else this.followings = followings;
     }
 
     setActiveTab = (activeTab: number) => {
@@ -141,21 +147,20 @@ export default class ProfileStore {
             runInAction(() => {
                 let shouldUpdateCurrentProfile = true;
 
-                if(this.profile && this.profile.username !== targetUsername) {
+                if (this.profile && this.profile.username !== targetUsername) {
                     shouldUpdateCurrentProfile = false;
                 }
 
                 if (this.profile && this.profile.username !== store.userStore.user?.username
                     && shouldUpdateCurrentProfile
                     // && this.profile.username !== username
-                ) 
-                {
+                ) {
                     follow ? this.profile.followersCount++ : this.profile.followersCount--;
                     this.profile.following = !this.profile.following;
                 }
                 //after adjust the target profile followers count, we need to update its followings collection
                 //if A is watching B and B unfollow/follow someone, update the status here
-                if(this.profile && this.profile.username === store.userStore.user?.username) {
+                if (this.profile && this.profile.username === store.userStore.user?.username) {
                     follow ? this.profile.followingCount++ : this.profile.followingCount--;
                 }
 
@@ -165,7 +170,6 @@ export default class ProfileStore {
                         following.following = !following.following;
                     }
                 })
-                
                 this.loading = false;
             })
         } catch (error) {
@@ -178,7 +182,6 @@ export default class ProfileStore {
 
     loadFollowings = async (predicate: string) => {
         this.loadingFollowing = true;
-
         try {
             const followings = await agent.Profiles.listFollowing(this.profile!.username, predicate);
             runInAction(() => {
